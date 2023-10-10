@@ -265,12 +265,12 @@ const WheelComponent = ({
       keepGoing = true;
     }
     currentSegment = segments[i].name;
-    currentIndex = i;
+    // currentIndex = i;
     // isStarted && ctx.fillText(currentSegment, centerX + 10, centerY + size + 50)
   }
   const clear = () => {
     const ctx = canvasContext
-    ctx.clearRect(0, 0, 1000, 800)
+    ctx.clearRect(0, 0, gameWidth, gameHeight)
   }
   return (
     <div id='wheel'>
