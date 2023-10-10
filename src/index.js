@@ -11,7 +11,10 @@ function getWinningSegment(segments) {
     }
   }
 
-  return { name: segments[segments.length - 1].name, index: segments.length - 1 };
+  return { 
+    name: segments[segments.length - 1].name, 
+    index: segments.length - 1 
+  };
 };
 
 const WheelComponent = ({
@@ -25,8 +28,15 @@ const WheelComponent = ({
   size = 290,
   upDuration = 100,
   downDuration = 1000,
-  fontFamily = 'proxima-nova'
+  fontFamily = 'proxima-nova',
+  gameWidth = 1000
 }) => {
+  let gameHeight = gameWidth; // * .80;
+  let needleSize = gameWidth * .10;
+  let lineWidth = gameWidth * .02;
+  console.log("game dimensions", {
+    gameWidth, gameHeight
+  })
   let currentSegment = ''
   let isStarted = false
   const [isFinished, setFinished] = useState(false)
@@ -40,17 +50,15 @@ const WheelComponent = ({
   const downTime = segments.length * downDuration
   let spinStart = 0
   let frames = 0
-  const centerX = 300
-  const centerY = 300
+  const centerX = gameWidth / 2
+  const centerY = gameHeight / 2
 
   /** custom vars */
   let winningSegment = {};
-  let currentIndex = 0;
   let downAdjustment = 1;
   let segmentHistory = [];
   let randomizer = Math.floor(Math.random() * (500 - 100 + 1)) + 100;
   let keepGoing = true;
-  let slowDownRate = .001;
 
   useEffect(() => {
     wheelInit()
@@ -68,8 +76,8 @@ const WheelComponent = ({
     console.log(navigator)
     if (navigator.userAgent.indexOf('MSIE') !== -1) {
       canvas = document.createElement('canvas')
-      canvas.setAttribute('width', 1000)
-      canvas.setAttribute('height', 600)
+      canvas.setAttribute('width', gameWidth)
+      canvas.setAttribute('height', gameHeight)
       canvas.setAttribute('id', 'canvas')
       document.getElementById('wheel').appendChild(canvas)
     }
@@ -200,10 +208,10 @@ const WheelComponent = ({
 
     // Draw a center circle
     ctx.beginPath()
-    ctx.arc(centerX, centerY, 50, 0, PI2, false)
+    ctx.arc(centerX, centerY, needleSize, 0, PI2, false)
     ctx.closePath()
     ctx.fillStyle = primaryColor
-    ctx.lineWidth = 10
+    ctx.lineWidth = lineWidth
     ctx.strokeStyle = contrastColor
     ctx.fill()
     ctx.font = 'bold 1em ' + fontFamily
@@ -217,7 +225,7 @@ const WheelComponent = ({
     ctx.arc(centerX, centerY, size, 0, PI2, false)
     ctx.closePath()
 
-    ctx.lineWidth = 10
+    ctx.lineWidth = lineWidth
     ctx.strokeStyle = primaryColor
     ctx.stroke()
   }
@@ -229,9 +237,9 @@ const WheelComponent = ({
     ctx.strokeStyle = contrastColor
     ctx.fileStyle = contrastColor
     ctx.beginPath()
-    ctx.moveTo(centerX + 20, centerY - 50)
-    ctx.lineTo(centerX - 20, centerY - 50)
-    ctx.lineTo(centerX, centerY - 70)
+    ctx.moveTo(centerX + needleSize * .20, centerY - needleSize)
+    ctx.lineTo(centerX - needleSize * .20, centerY - needleSize)
+    ctx.lineTo(centerX, centerY - needleSize - 20)
     ctx.closePath()
     ctx.fill()
     const change = angleCurrent + Math.PI / 2
@@ -240,9 +248,13 @@ const WheelComponent = ({
       Math.floor((change / (Math.PI * 2)) * segments.length) -
       1
     console.log("change", { change: change, i: i })
-    if (i < 0) i = i + segments.length
+    if (i < 0) {
+      i = i + segments.length;
+    }
     segmentHistory.push(i);
-    if (segmentHistory.length > randomizer) { segmentHistory.shift(); }
+    if (segmentHistory.length > randomizer) { 
+      segmentHistory.shift(); 
+    }
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = primaryColor
@@ -264,8 +276,8 @@ const WheelComponent = ({
     <div id='wheel'>
       <canvas
         id='canvas'
-        width='1000'
-        height='800'
+        width={gameWidth}
+        height={gameHeight}
         style={{
           pointerEvents: isFinished && isOnlyOnce ? 'none' : 'auto'
         }}
