@@ -86,7 +86,6 @@ const WheelComponent = ({
       spinStart = new Date().getTime()
       maxSpeed = Math.PI / 20;
       frames = 0
-      downAdjustment = 1;
       timerHandle = setInterval(onTimerTick, timerDelay)
     }
   }
