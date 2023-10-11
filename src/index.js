@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react'
 
 function getWinningSegment(segments) {
-  const num = Math.random();
-  let sum = 0;
+  const num = Math.random()
+  let sum = 0
 
   for (let i in segments) {
-    sum += segments[i].probability;
+    sum += segments[i].probability
     if (num <= sum) {
-      return { name: segments[i].name, index: i };
+      return { name: segments[i].name, index: i }
     }
   }
 
   return { 
     name: segments[segments.length - 1].name, 
     index: segments.length - 1 
-  };
-};
+  }
+}
 
 const WheelComponent = ({
   segments,
@@ -34,9 +34,6 @@ const WheelComponent = ({
   let gameHeight = gameWidth; // * .80;
   let needleSize = gameWidth * .10;
   let lineWidth = gameWidth * .02;
-  console.log("game dimensions", {
-    gameWidth, gameHeight
-  })
   let currentSegment = ''
   let isStarted = false
   const [isFinished, setFinished] = useState(false)
@@ -54,10 +51,9 @@ const WheelComponent = ({
   const centerY = gameHeight / 2
 
   /** custom vars */
-  let winningSegment = {};
-  let downAdjustment = 1;
-  let segmentHistory = [];
-  let randomizer = Math.floor(Math.random() * (500 - 100 + 1)) + 100;
+  let winningSegment = {}
+  let segmentHistory = []
+  let randomizer = Math.floor(Math.random() * 100);
   let keepGoing = true;
 
   useEffect(() => {
@@ -73,7 +69,6 @@ const WheelComponent = ({
 
   const initCanvas = () => {
     let canvas = document.getElementById('canvas')
-    console.log(navigator)
     if (navigator.userAgent.indexOf('MSIE') !== -1) {
       canvas = document.createElement('canvas')
       canvas.setAttribute('width', gameWidth)
@@ -86,12 +81,9 @@ const WheelComponent = ({
   }
   const spin = () => {
     winningSegment = getWinningSegment(segments);
-    console.log("picked winner", { winningSegment })
     isStarted = true
     if (timerHandle === 0) {
       spinStart = new Date().getTime()
-      // maxSpeed = Math.PI / ((segments.length*2) + Math.random())
-      // maxSpeed = Math.PI / segments.length
       maxSpeed = Math.PI / 20;
       frames = 0
       downAdjustment = 1;
@@ -99,50 +91,27 @@ const WheelComponent = ({
     }
   }
   const onTimerTick = () => {
-    console.log("in ontimertick");
     frames++
     draw()
     const duration = new Date().getTime() - spinStart
     let progress = 0
     let finished = false
-    let newSpeed = 0;
+    let newSpeed = 0
     if (duration < upTime) {
       progress = duration / upTime
       angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2)
     } else {
-      // if (Math.abs(currentIndex - winningSegment.index) > 1)
-      // slowDownRate = downAdjustment < .40 ? .0001 : downAdjustment < .30 ? .00001 : slowDownRate;
-      if (duration > upTime + downTime) {
-        if (currentSegment === winningSegment.name && frames > segments.length) {
-          finished = !keepGoing;
-        }
-        // downAdjustment -= slowDownRate * downAdjustment;
-        // console.log("change again", { downAdjustment, currentIndex, toGo: Math.abs(currentIndex - winningSegment.index)});
-
-        progress = upTime / duration
-        newSpeed = maxSpeed * progress //* downAdjustment
-        angleDelta = newSpeed * Math.sin(progress * Math.PI / 2)
-      } else {
-        progress = upTime / duration
-        newSpeed = maxSpeed * progress
-        angleDelta = newSpeed * Math.sin(progress * Math.PI / 2)
+      if (currentSegment === winningSegment.name && frames > segments.length && duration > upTime + downTime) {
+        finished = !keepGoing
       }
+
+      progress = upTime / duration
+      newSpeed = maxSpeed * progress
+      angleDelta = newSpeed * Math.sin(progress * Math.PI / 2)
     }
 
     angleCurrent += angleDelta
     while (angleCurrent >= Math.PI * 2) angleCurrent -= Math.PI * 2
-
-    // console.log("ontimertick", {
-    //   progress,
-    //   maxSpeed,
-    //   newSpeed,
-    //   angleDelta,
-    //   angleCurrent,
-    //   duration,
-    //   upTime,
-    //   downTime,
-    //   finished,
-    // })
 
     if (finished) {
       setFinished(true)
@@ -154,21 +123,18 @@ const WheelComponent = ({
   }
 
   const wheelDraw = () => {
-    console.log("in wheeldraw");
     clear()
     drawWheel()
     drawNeedle()
   }
 
   const draw = () => {
-    console.log("in draw");
     clear()
     drawWheel()
     drawNeedle()
   }
 
   const drawSegment = (key, lastAngle, angle) => {
-    console.log("in drawsegment");
     const ctx = canvasContext
     const value = segments[key].name
     ctx.save()
@@ -190,7 +156,6 @@ const WheelComponent = ({
   }
 
   const drawWheel = () => {
-    console.log("in drawwheel");
     const ctx = canvasContext
     let lastAngle = angleCurrent
     const len = segments.length
@@ -231,7 +196,6 @@ const WheelComponent = ({
   }
 
   const drawNeedle = () => {
-    console.log("in drawneedle");
     const ctx = canvasContext
     ctx.lineWidth = 1
     ctx.strokeStyle = contrastColor
@@ -247,7 +211,6 @@ const WheelComponent = ({
       segments.length -
       Math.floor((change / (Math.PI * 2)) * segments.length) -
       1
-    console.log("change", { change: change, i: i })
     if (i < 0) {
       i = i + segments.length;
     }
@@ -265,8 +228,6 @@ const WheelComponent = ({
       keepGoing = true;
     }
     currentSegment = segments[i].name;
-    // currentIndex = i;
-    // isStarted && ctx.fillText(currentSegment, centerX + 10, centerY + size + 50)
   }
   const clear = () => {
     const ctx = canvasContext
